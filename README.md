@@ -1,23 +1,23 @@
 # ArgoCD Labs
 
-Laboratório para estudar GitOps com Argo CD e estratégias de entrega progressiva com Argo Rollouts em um cluster local `kind`.
+Hands-on lab repository for studying GitOps with Argo CD and progressive delivery strategies with Argo Rollouts on a local `kind` cluster.
 
-Os cenários incluídos são:
+The included scenarios are:
 
-- `basic`: deployment tradicional sincronizado pelo Argo CD
-- `canary`: rollout canário com Argo Rollouts
-- `bluegreen`: rollout blue/green com serviço ativo e preview
+- `basic`: traditional deployment synchronized by Argo CD
+- `canary`: canary rollout with Argo Rollouts
+- `bluegreen`: blue/green rollout with active and preview services
 
-## Objetivo
+## Purpose
 
-Este repositório demonstra, de forma prática, como:
+This repository demonstrates, in a practical way, how to:
 
-- criar um cluster local para testes
-- instalar Argo CD e Argo Rollouts
-- bootstrapar aplicações a partir do próprio Git
-- comparar deployment comum, canário e blue/green
+- create a local cluster for testing
+- install Argo CD and Argo Rollouts
+- bootstrap applications from Git
+- compare a standard deployment, canary, and blue/green rollout
 
-## Estrutura
+## Structure
 
 ```text
 .
@@ -47,71 +47,71 @@ Este repositório demonstra, de forma prática, como:
 └── README.md
 ```
 
-## O que mudou na organização
+## What Changed in the Organization
 
-Agora o repositório separa responsabilidades com mais clareza:
+The repository now separates responsibilities more clearly:
 
-- `apps/`: manifests Kubernetes e Rollouts dos cenários
-- `bootstrap/`: `Application` resources do Argo CD
-- `cluster/`: configuração do cluster local
-- `scripts/`: automação de instalação e bootstrap
+- `apps/`: Kubernetes manifests and Rollouts for each scenario
+- `bootstrap/`: Argo CD `Application` resources
+- `cluster/`: local cluster configuration
+- `scripts/`: installation and bootstrap automation
 
-Também houve padronização para `yaml` e os `Application` passaram a apontar para `targetRevision: main` em vez de `HEAD`.
+The repository also now uses `yaml` consistently, and the `Application` manifests point to `targetRevision: main` instead of `HEAD`.
 
-## Pré-requisitos
+## Prerequisites
 
-Tenha estes binários instalados:
+Install these binaries first:
 
 - `docker`
 - `kind`
 - `kubectl`
 - `argocd`
 
-Opcional, mas recomendado para acompanhar os rollouts:
+Optional, but recommended for observing rollouts:
 
 - `kubectl-argo-rollouts`
 
-## Fluxo rápido
+## Quick Start
 
-### 1. Subir tudo de uma vez
+### 1. Bring Everything Up at Once
 
 ```bash
 sh scripts/bootstrap.sh
 ```
 
-Esse script:
+This script:
 
-- cria o cluster `kind` com [cluster/kind.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/cluster/kind.yaml)
-- instala o Argo CD
-- instala o Argo Rollouts
-- aguarda os deployments principais ficarem disponíveis
+- creates the `kind` cluster using [cluster/kind.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/cluster/kind.yaml)
+- installs Argo CD
+- installs Argo Rollouts
+- waits for the main deployments to become available
 
-### 2. Abrir a UI do Argo CD
+### 2. Open the Argo CD UI
 
 ```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
 
-Em outro terminal:
+In another terminal:
 
 ```bash
 sh scripts/get-argocd-password.sh
 ```
 
-Acesso:
+Access:
 
 - URL: `https://localhost:8080`
-- usuário: `admin`
+- username: `admin`
 
-### 3. Registrar os laboratórios no Argo CD
+### 3. Register the Labs in Argo CD
 
-Você pode aplicar tudo de uma vez pelo padrão app-of-apps:
+You can register everything at once using the app-of-apps pattern:
 
 ```bash
 kubectl apply -f bootstrap/root-application.yaml
 ```
 
-Ou registrar cenários individualmente:
+Or register each scenario individually:
 
 ```bash
 kubectl apply -f bootstrap/applications/basic.yaml
@@ -119,18 +119,18 @@ kubectl apply -f bootstrap/applications/canary.yaml
 kubectl apply -f bootstrap/applications/bluegreen.yaml
 ```
 
-## Cenários
+## Scenarios
 
 ### `basic`
 
-Aplica os recursos de [apps/basic/manifests/deployment.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/apps/basic/manifests/deployment.yaml) no namespace `basic`.
+Applies the resources from [apps/basic/manifests/deployment.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/apps/basic/manifests/deployment.yaml) into the `basic` namespace.
 
-Recursos criados:
+Created resources:
 
 - `Deployment`
 - `Service`
 
-Verificação:
+Verification:
 
 ```bash
 kubectl get all -n basic
@@ -138,17 +138,17 @@ kubectl get all -n basic
 
 ### `canary`
 
-Aplica os recursos de [apps/canary/manifests/rollout.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/apps/canary/manifests/rollout.yaml) no namespace `canary`.
+Applies the resources from [apps/canary/manifests/rollout.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/apps/canary/manifests/rollout.yaml) into the `canary` namespace.
 
-Estratégia configurada:
+Configured strategy:
 
 - 25%
-- pausa
+- pause
 - 50%
-- pausa
+- pause
 - 100%
 
-Verificação:
+Verification:
 
 ```bash
 kubectl get all -n canary
@@ -157,15 +157,15 @@ kubectl argo rollouts get rollout canary -n canary --watch
 
 ### `bluegreen`
 
-Aplica os recursos de [apps/bluegreen/manifests/rollout.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/apps/bluegreen/manifests/rollout.yaml) no namespace `bluegreen`.
+Applies the resources from [apps/bluegreen/manifests/rollout.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/apps/bluegreen/manifests/rollout.yaml) into the `bluegreen` namespace.
 
-Estratégia configurada:
+Configured strategy:
 
-- serviço ativo para produção
-- serviço preview para validação
-- promoção manual
+- active service for production traffic
+- preview service for validation
+- manual promotion
 
-Verificação:
+Verification:
 
 ```bash
 kubectl get all -n bluegreen
@@ -175,34 +175,34 @@ kubectl argo rollouts promote bluegreen -n bluegreen
 
 ## App of Apps
 
-O manifesto [bootstrap/root-application.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/root-application.yaml) registra de uma vez os três `Application` filhos localizados em [bootstrap/applications/basic.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/applications/basic.yaml), [bootstrap/applications/canary.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/applications/canary.yaml) e [bootstrap/applications/bluegreen.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/applications/bluegreen.yaml).
+The manifest [bootstrap/root-application.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/root-application.yaml) registers the three child `Application` resources at [bootstrap/applications/basic.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/applications/basic.yaml), [bootstrap/applications/canary.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/applications/canary.yaml), and [bootstrap/applications/bluegreen.yaml](/Users/guilhermefaleirosdesiqueira/studies/argocd-labs/bootstrap/applications/bluegreen.yaml) in one step.
 
-Esse é o fluxo mais próximo de um bootstrap GitOps real para este laboratório.
+This is the closest flow in this repository to a real GitOps bootstrap.
 
-## Como testar mudanças
+## How to Test Changes
 
-Faça alterações nos manifests em `apps/`, por exemplo:
+Make changes in the manifests under `apps/`, for example:
 
-- mudar a imagem `kubedevio/web-color`
-- alterar número de réplicas
-- mudar pesos e pausas do canário
-- mudar o comportamento de promoção do blue/green
+- change the `kubedevio/web-color` image
+- adjust the replica count
+- change canary weights and pauses
+- change blue/green promotion behavior
 
-Depois:
+Then:
 
-1. faça commit e push
-2. aguarde o Argo CD reconciliar
-3. acompanhe pela UI ou com `kubectl`
+1. commit and push
+2. wait for Argo CD to reconcile
+3. follow the result in the UI or with `kubectl`
 
-## Comandos úteis
+## Useful Commands
 
-Listar aplicações:
+List applications:
 
 ```bash
 kubectl get applications -n argocd
 ```
 
-Listar recursos dos cenários:
+List scenario resources:
 
 ```bash
 kubectl get all -n basic
@@ -210,30 +210,30 @@ kubectl get all -n canary
 kubectl get all -n bluegreen
 ```
 
-Listar rollouts:
+List rollouts:
 
 ```bash
 kubectl get rollout -n canary
 kubectl get rollout -n bluegreen
 ```
 
-## Sobre versões
+## About Versions
 
-Os scripts de instalação aceitam sobrescrita por variável de ambiente:
+The install scripts support overriding the source URL through environment variables:
 
 - `ARGOCD_INSTALL_URL`
 - `ROLLOUTS_INSTALL_URL`
 
-Exemplo:
+Example:
 
 ```bash
-ARGOCD_INSTALL_URL="https://raw.githubusercontent.com/argoproj/argo-cd/<versao>/manifests/install.yaml" \
+ARGOCD_INSTALL_URL="https://raw.githubusercontent.com/argoproj/argo-cd/<version>/manifests/install.yaml" \
 sh scripts/install-argocd.sh
 ```
 
-Isso permite fixar versões sem editar os scripts.
+This makes it possible to pin versions without editing the scripts.
 
-## Limpeza
+## Cleanup
 
 ```bash
 kind delete cluster
