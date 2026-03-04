@@ -1,40 +1,20 @@
-apiVersion: v1
-kind: Service
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   name: canary
+  namespace: argocd
 spec:
-  selector:
-    app: canary
-  ports:
-    - port: 80
-      targetPort: 80
-  type: NodePort
----
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
-metadata:
-  name: bluegreen
-spec:
-  replicas: 4
-  selector:
-    matchLabels:
-      app: canary
-  template:
-    metadata:
-      labels:
-        app: canary
-    spec:
-      containers:
-        - name: bluegreen
-          image: kubedevio/web-color:green
-          ports:
-            - containerPort: 80
-  minReadySeconds: 30
-  strategy:
-    canary:
-      steps:
-        - setWeight: 25
-        - pause: {}
-        - setWeight: 50
-        - pause: {}
-        - setWeight: 100
+  project: default
+  source:
+    repoURL: https://github.com/guilhermefaleiros/argocd-labs.git
+    targetRevision: HEAD
+    path: canary/k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: canary
+  syncPolicy: # Politicas de sincronização
+    syncOptions:
+      - CreateNamespace=true # Cria o namespace, caso não exista
+    automated: # Configurações referente a automação da sincronização
+      selfHeal: true # Aplica as configurações caso tenha alteração no repositório a cada 3 min
+      prune: true # Remove elementos na sincronização
