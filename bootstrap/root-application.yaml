@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-labs
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/guilhermefaleiros/argocd-labs.git
+    targetRevision: main
+    path: bootstrap/applications
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
