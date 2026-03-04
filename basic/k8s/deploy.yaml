@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webcolor
+  name: basic
 spec:
-  replicas: 10
+  replicas: 4
   selector:
     matchLabels:
-      app: webcolor
+      app: basic
   template:
     metadata:
       labels:
-        app: webcolor
+        app: basic
     spec:
       containers:
-        - name: webcolor
+        - name: basic
           image: kubedevio/web-color:blue
           ports:
             - containerPort: 80
@@ -21,10 +21,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: webcolor
+  name: basic
 spec:
   selector:
-    app: webcolor
+    app: basic
   ports:
     - port: 80
       targetPort: 80
