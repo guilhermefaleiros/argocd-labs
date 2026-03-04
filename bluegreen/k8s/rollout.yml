@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: bluegreen
-          image: kubedevio/web-color:blue
+          image: kubedevio/web-color:green
           ports:
             - containerPort: 80
   minReadySeconds: 30
