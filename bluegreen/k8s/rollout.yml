@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bluegreen-active
+spec:
+  selector:
+    app: bluegreen
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bluegreen-preview
+spec:
+  selector:
+    app: bluegreen
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: bluegreen
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: bluegreen
+  template:
+    metadata:
+      labels:
+        app: bluegreen
+    spec:
+      containers:
+        - name: bluegreen
+          image: kubedevio/web-color:blue
+          ports:
+            - containerPort: 80
+  minReadySeconds: 30
+  strategy:
+    blueGreen:
+      activeService: bluegreen-active
+      previewService: bluegreen-preview
+      autoPromotionEnabled: false
+      autoPromotionSeconds: 30
+      scaleDownDelaySeconds: 60
