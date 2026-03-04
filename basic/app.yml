@@ -2,16 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: simple
-  namespace: simple
+  namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/fabricioveronez/argocd-setup.git
+    repoURL: https://github.com/guilhermefaleiros/argocd-labs.git
     targetRevision: HEAD
     path: basic/k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: simple
   syncPolicy: # Politicas de sincronização
     syncOptions:
       - CreateNamespace=true # Cria o namespace, caso não exista
