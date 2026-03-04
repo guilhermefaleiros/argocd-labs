@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: canary
-          image: kubedevio/web-color:green
+          image: kubedevio/web-color:blue
           ports:
             - containerPort: 80
   minReadySeconds: 30
